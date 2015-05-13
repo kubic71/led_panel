@@ -1,14 +1,20 @@
-import system
-
-try:
-    import svetelny_panel as sp
-except:
-    print "Cannot find module 'svetelny_panel'"
-    exit()
-exit()
-
 
 wi, sp = None, None
+
+"""
+--- How to use ---
+
+import infrapen
+infrapen.init(svetelny_panel, wimote)
+
+
+x, y = infrapen.get_coords()
+# (x, y) are transformed coordinates
+
+"""
+
+
+
 
 class Pohled:
     """Used to map pixels in a non-rectangular quad to a rectangular one"""
@@ -161,17 +167,25 @@ class Pohled:
 
 
 def init(svetelny_panel, wimote):
+    #Needs svetelny_panel module and wimote instance
+    
     global wi, pohl, sp
     wi = wimote
     sp = svetelny_panel
     pohl = Pohled()
-    pohl.setdst((0,0), (14,0), (0,8), (14,8))
+
+    
     BOARDX = 15
     BOARDY = 9
+    
+    #Set output dimensions of led panel
     pohl.setdst((0,0), (BOARDX-1,0), (0,BOARDY-1), (BOARDX-1, BOARDY-1))
 
     sp.panel_clear()
 
+
+    #----Configure physical led panel dimensions----
+    
     #Down-left
     sp.set_pixel_color(sp.matrix(0,0),"ffffff")	
     print "klikni vlevo dole"
@@ -213,6 +227,8 @@ def init(svetelny_panel, wimote):
 
 
 def get_raw_cords():
+    #Return non-transformed raw infrapen coordinates (x, y), or None if canceled
+    
     if not wi:
         print "Not initialized!"
         return None
@@ -235,29 +251,34 @@ def get_raw_cords():
     
 
 def get_cords():
+    #Returns transformed infrapen coordinates (x, y), or None if canceled 
+    
     if not wi or not sp:
         print "Not initialized!"
 
-
+    
     cords = wi.state["ir_src"][0]
     
     while True:
         if cords:
             break
+        
         buttons = wi.state["buttons"]
-        if buttons & 4:     #Don't wait for infrapen
+        if buttons & 4:     #Don't wait for infrapen, cancel 
             return None
 
 	cords = wi.state["ir_src"][0]
 
     x, y = cords["pos"]
-    
+
+
+    #calculate coordinates transformations
     x, y = pohl.warp(x, y)
     x, y = int(x), int(y)
 
     
 
-    return cord
+    return x, y
     
 
 

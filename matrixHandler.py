@@ -14,6 +14,25 @@ face = [
 "   xxx   "  ]
 
 
+"""
+MatrixHandler contains list of objects that can be projected into final matrix for ledpanel.
+
+Features:
+    - add and remove objects
+        matrixHandler.insert_object(matrixObject)
+    - shift all objects UP, DOWN, LEFT, RIGHT
+        matrixHandler.shift_up()
+        matrixHandler.shift_down()
+        matrixHandler.shift_left()
+        matrixHandler.shift_right()
+
+        matrixHandler.shift(x_diff, y_diff)
+
+
+"""
+
+
+
 
     
 
@@ -48,9 +67,9 @@ class MatrixObject:
         self.size_row = len(object)
 
 
-    def shift(self, rowdiff, coldiff):
-        self.row += rowdiff
-        self.col += coldiff
+    def shift(self, x_shift, y_shift):
+        self.row += y_shift
+        self.col += x_shift
 
 
     def __getitem__(self, row):
@@ -67,7 +86,7 @@ class MatrixEngine:
         self.matrix = None
         
 
-    def get_matrix(self, cycle=True, cycle_size_col=0, cycle_size_row=0):
+    def get_matrix(self, cycle_x=False, cycle_y=False, cycle_size_x=0, cycle_size_y=0):
         matrix = [["000000" for c in range(self.size_col)] for r in range(self.size_row)]
         for obj in  self.objects:
             for object_col in range(obj.size_col):
@@ -77,15 +96,16 @@ class MatrixEngine:
                     world_col = object_col + obj.col
 
 
-                    if cycle:
-                        if cycle_size_col == 0:
-                            cycle_size_col = self.size_col
+                    if cycle_x:
+                        if cycle_size_x == 0:
+                            cycle_size_x = self.size_col
+                        world_col %= cycle_size_x
 
-                        if cycle_size_row == 0:
-                            cycle_size_row = self.size_row
-                            
-                        world_row %= cycle_size_row
-                        world_col %= cycle_size_col
+                    if cycle_y:
+                        if cycle_size_y == 0:
+                            cycle_size_y = self.size_row
+                        world_row %= cycle_size_y
+                        
 
                     if world_col >= 0 and world_col < self.size_col and world_row >= 0 and world_row < self.size_row:
                         #If object is in visible area
@@ -95,6 +115,8 @@ class MatrixEngine:
                         else:
                             #Some color is already on this pixel
                             old = matrix[world_row][world_col]
+
+                            #XOR on that pixel
                             matrix[world_row][world_col] = self.color_xor(old, color)    #Making xor for two colors
                             
 
@@ -129,25 +151,25 @@ class MatrixEngine:
         self.objects = []
 
     
-    def shift(self, rowdiff=0, coldiff=1):
+    def shift(self, x_shift=1, y_shift=0):
         for matrixObject in self.objects:
-            matrixObject.shift(rowdiff, coldiff)
+            matrixObject.shift(x_shift, y_shift)
             
 
 
     def shift_left(self):
-        self.shift(0, -1)
+        self.shift(-1, 0)
         
 
     def shift_right(self):
-        self.shift(0, 1)
+        self.shift(1, 0)
 
     def shift_up(self):
-        self.shift(-1, 0)
+        self.shift(0, -1)
 
 
     def shift_down(self):
-        self.shift(1, 0)
+        self.shift(0, 1)
         
 
             

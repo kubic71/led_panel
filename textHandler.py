@@ -1,11 +1,6 @@
 from matrixHandler import *
-import sys
+import sys, colors
 
-
-BLACK = "000000"
-WHITE = "ffffff"
-BLUE = "0000FF"
-RED = "FF0000"
 
 class CharMatrix:
     def __init__(self, name, charwidth):
@@ -54,16 +49,13 @@ class TextHandler:
             
 
             char = CharMatrix(name, biggiest_width)
-            char.matrix = fonts[name]
-                    
-            print char
-                    
+            char.matrix = fonts[name]        
             self.font[name] = char
                     
                     
 
 
-    def make_text(self, text, start_poscol=0, start_posrow=1, space_between=0, color="ffffff"):
+    def make_text(self, text, x_shift=0, y_shift=0, space_between=0, color=colors.WHITE):
 
         print "Making text:" + text.encode("utf-8")
         #Makes MatrixObject sequence
@@ -72,13 +64,13 @@ class TextHandler:
 
         textwidth = 0
         
-        poscol = start_poscol
-        posrow = start_posrow
+        poscol = x_shift
+        posrow = y_shift
         for letter in text:
 
-            print letter.encode("utf-8")
 
-            print letter in self.font
+            if letter not in self.font:
+                print "Letter " + letter.encode("utf-8") + " not found in char map!"
             
             
             if letter in self.font:
