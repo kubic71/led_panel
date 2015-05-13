@@ -8,7 +8,7 @@ svetelny_panel.setup()
 textHandler = TextHandler()
 #text, textwidth = textHandler.make_text("Sedi dva smutni informatici v serverovne, prijde k nim treti a pta se:- Proc jste tak smutni? - No vcera jsme se trosku ozrali a menili jsme hesla..", 16)     #Text is shifted 16 pixels horizonataly to right
 
-text, textwidth = textHandler.make_text("Už Ý Á É umíme háčky i čárky!".decode("utf-8"), 16)     #Text is shifted 16 pixels horizonataly to right
+text, textwidth = textHandler.make_text("Už umíme háčky i čárky!".decode("utf-8"), 16)     #Text is shifted 16 pixels horizonataly to right
 
 engine = MatrixEngine(text) #Creates Engine object with text 'Hello world'
 
