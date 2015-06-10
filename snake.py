@@ -50,12 +50,10 @@ class Snake:
         matrix = [[colors.BLACK for x in range(self.width)] for y in range(self.height)]
 
 
+        #Numeric snake RGB color
         r = 128 + math.sin(self.snake_color_phase_r)*100
         g = 128 + math.sin(self.snake_color_phase_g)*100
         b = 128 + math.sin(self.snake_color_phase_b)*100
-        
-        
-        #r,g,b = map(lambda x: int(x, base=16), [self.SNAKE_COLOR[0:2], self.SNAKE_COLOR[2:4], self.SNAKE_COLOR[4:6]])
         
 
         x, y = self.body[0]     #Head
@@ -65,9 +63,12 @@ class Snake:
         for i, cell  in enumerate(self.body[1:]):
             x, y = cell
 
-            r2, g2, b2 =  map(lambda x: int((1-(float(i)*0.5/len(self.body))) * x), [r, g, b])
-            
-            color = "".join(map(lambda x: hex(x)[2:], [r2, g2, b2]))
+            r2, g2, b2 =  map(lambda y: int((1-(float(i)*0.5/len(self.body))) * y), [r, g, b])  #Dim snake's tail
+
+            color = "".join(map(lambda x: hex(x)[2:].zfill(2), [r2, g2, b2]))
+            if len(color) != 6:
+                print r2, g2, b2
+                print color
             
             matrix[y][x] = color
 
@@ -103,7 +104,7 @@ class Snake:
         new =  [self.body[0][0] + self.direction[0], self.body[0][1] + self.direction[1]]
 
 
-        #Snake color modification
+        #Snake random color modification
         self.snake_color_phase_r, self.snake_color_phase_g, self.snake_color_phase_b =  self.snake_color_phase_r + random.randint(5, 10)/100., self.snake_color_phase_g + random.randint(10, 15)/100., self.snake_color_phase_b + random.randint(5, 15)/100.
 
         #Food color modification
@@ -127,7 +128,7 @@ class Snake:
             #Snake has crashed to a wall
             return False
         
-        if new in self.body:    #Snake has eaten itself
+        if new in self.body[:-1]:    #Snake has eaten itself (not taking the last cell of snake into account, because it moves away)
             return False
         
         #----Valid Move----
@@ -193,21 +194,25 @@ class Snake:
         self.__init__()
 
     def turn_left(self):
-        if self.direction != [1, 0]:
+        new_pos = [self.body[0][0] -1, self.body[0][1]] 
+        if self.body[1] != new_pos:     #Check wheter direction change is valid
             self.direction = [-1, 0]
 
     def turn_right(self):
-        if self.direction != [-1, 0]:
+        new_pos = [self.body[0][0] + 1, self.body[0][1]]
+        if self.body[1] != new_pos: #Check wheter direction change is valid
             self.direction = [1, 0]
 
     def turn_up(self):
-        if self.direction != [0, 1]:
+        new_pos = [self.body[0][0], self.body[0][1] - 1]
+        if self.body[1] != new_pos:     #Check wheter direction change is valid
             self.direction = [0, -1]
 
-    def turn_down(self):
-        if self.direction != [0, -1]:
-            self.direction = [0, 1]
 
+    def turn_down(self):
+        new_pos = [self.body[0][0], self.body[0][1] + 1]
+        if self.body[1] != new_pos:     #Check wheter direction change is valid
+            self.direction = [0, 1]
         
 
 
@@ -228,8 +233,8 @@ if __name__ == "__main__":
         wi = svetelny_panel.winit()
 
     last_move = time.time()
-
-
+    DELAY = 0.15   #Delay between steps in seconds
+        
 
     RIGHT = False
     UP = False
@@ -307,7 +312,7 @@ if __name__ == "__main__":
 
 
 
-        if (time.time() - last_move) > 0.1:         #Automatic move-down
+        if (time.time() - last_move) > DELAY:         #Automatic move-down
             last_move = time.time()
             game.step()
             
